@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, PiggyBank, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, PiggyBank, Shield, Sparkles, TrendingUp } from "lucide-react";
 import heroImage from "@/assets/hero-illustration.png";
 import { authAPI } from "@/services/api";
 
@@ -12,9 +12,9 @@ const features = [
     description: "AI-powered expense breakdown with actionable insights to optimize your spending.",
   },
   {
-    icon: PiggyBank,
-    title: "Savings Prediction",
-    description: "Forecast your future savings with ML-based projections and goal tracking.",
+    icon: TrendingUp,
+    title: "Financial Goal Planning",
+    description: "Set your long-term dreams and get a personalized year-by-year achievement roadmap.",
   },
   {
     icon: Shield,

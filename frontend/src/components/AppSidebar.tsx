@@ -9,6 +9,7 @@ import {
   Wallet,
   LogOut,
   User,
+  Target,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,8 +34,8 @@ const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Financial Input", url: "/input", icon: FileInput },
   { title: "Budget Analysis", url: "/analysis", icon: PieChart },
-  { title: "Savings Prediction", url: "/savings", icon: TrendingUp },
-{ title: "Health Score", url: "/health", icon: Activity },
+  { title: "Financial Goal", url: "/goals", icon: Target },
+  { title: "Health Score", url: "/health", icon: Activity },
 ];
 
 export function AppSidebar() {

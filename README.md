@@ -1,72 +1,32 @@
-# Ai Financial Management - Setup Guide
+# AI Financial Management
 
-##Clone the repository
+## 🚀 How to Start
 
-```bash
-git clone https://github.com/Ragunath041/ai_financial_management.git
-cd ai-financial-management
-```
+### 1. Backend
 
-## Database Setup
-
-1. Open MySQL Workbench or MySQL CLI
-2. Create the database:
-
-```sql
-CREATE DATABASE ai_financial_management;
-```
-
-3. The tables will be created automatically when you run the backend
-
-## Backend Setup
-
-1. Navigate to backend folder:
+Navigate to the `backend` folder and run:
 
 ```bash
 cd backend
-```
-
-2. Install dependencies:
-
-```bash
 pip install -r requirements.txt
-```
-
-3. Configure environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and update:
-
-- `DB_PASSWORD` - Your MySQL password
-- `GEMINI_API_KEY` - Your Google Gemini API key
-- `SECRET_KEY` - A strong secret key for Flask
-- `JWT_SECRET_KEY` - A strong secret key for JWT
-
-4. Run backend:
-
-```bash
 python app.py
 ```
 
-## Frontend Setup
+### 2. Frontend
 
-1. Navigate to frontend folder:
+Navigate to the `frontend` folder and run:
 
 ```bash
 cd frontend
-```
-
-2. Install dependencies:
-
-```bash
 npm install
+npm run dev
 ```
 
-3. Run frontend:
+### 🗄️ Database Seeding (Optional)
+
+To populate the database with sample data:
 
 ```bash
-npm run dev
+cd backend
+python seed_db.py
 ```

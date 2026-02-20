@@ -89,6 +89,8 @@ class FinancialData(db.Model):
     travel = db.Column(db.Float, default=0)
     others = db.Column(db.Float, default=0)
     savings_goal = db.Column(db.Float, default=0)
+    goal_name = db.Column(db.String(100))
+    target_years = db.Column(db.Integer, default=1)
     
     # Job & Location
     job_type = db.Column(db.String(50))
@@ -113,6 +115,8 @@ class FinancialData(db.Model):
             'travel': self.travel,
             'others': self.others,
             'savings_goal': self.savings_goal,
+            'goal_name': self.goal_name,
+            'target_years': self.target_years,
             'job_type': self.job_type,
             'city': self.city,
             'area': self.area,
@@ -313,6 +317,8 @@ def create_financial_data():
             existing_data.travel = float(data.get('travel', 0))
             existing_data.others = float(data.get('others', 0))
             existing_data.savings_goal = float(data.get('savingsGoal', 0))
+            existing_data.goal_name = data.get('goalName')
+            existing_data.target_years = int(data.get('targetYears', 1))
             existing_data.job_type = data.get('jobType')
             existing_data.city = data.get('city')
             existing_data.area = data.get('area')
@@ -337,6 +343,8 @@ def create_financial_data():
                 travel=float(data.get('travel', 0)),
                 others=float(data.get('others', 0)),
                 savings_goal=float(data.get('savingsGoal', 0)),
+                goal_name=data.get('goalName'),
+                target_years=int(data.get('targetYears', 1)),
                 job_type=data.get('jobType'),
                 city=data.get('city'),
                 area=data.get('area'),

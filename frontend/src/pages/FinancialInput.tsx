@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,18 +21,47 @@ export default function FinancialInput() {
     travel: "",
     others: "",
     savingsGoal: "",
+    goalName: "",
+    targetYears: "1",
     jobType: "",
     city: "",
     area: "",
     rentBudget: "",
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await financialAPI.get();
+        if (response) {
+          setForm({
+            salary: response.salary?.toString() || "",
+            rent: response.rent?.toString() || "",
+            food: response.food?.toString() || "",
+            travel: response.travel?.toString() || "",
+            others: response.others?.toString() || "",
+            savingsGoal: response.savings_goal?.toString() || "",
+            goalName: response.goal_name || "",
+            targetYears: response.target_years?.toString() || "1",
+            jobType: response.jobType || "",
+            city: response.city || "",
+            area: response.area || "",
+            rentBudget: response.rentBudget?.toString() || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching financial data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const validateForm = () => {
     // Check if all numeric fields are positive numbers
-    const numericFields = ['salary', 'rent', 'food', 'travel', 'others', 'savingsGoal', 'rentBudget'];
+    const numericFields = ['salary', 'rent', 'food', 'travel', 'others', 'savingsGoal', 'targetYears', 'rentBudget'];
     
     for (const field of numericFields) {
       const value = parseFloat(form[field as keyof typeof form]);
@@ -120,7 +149,7 @@ export default function FinancialInput() {
               { label: "Food Expense", field: "food" },
               { label: "Travel Expense", field: "travel" },
               { label: "Other Expenses", field: "others" },
-              { label: "Savings Goal", field: "savingsGoal" },
+              { label: "Goal Budget", field: "savingsGoal" },
             ].map(({ label, field }) => (
               <div key={field} className="space-y-2">
                 <Label htmlFor={field}>{label} (₹)</Label>
@@ -133,6 +162,26 @@ export default function FinancialInput() {
                 />
               </div>
             ))}
+            <div className="space-y-2">
+              <Label htmlFor="goalName">Goal Name (e.g. Dream Home)</Label>
+              <Input
+                id="goalName"
+                type="text"
+                value={form.goalName}
+                onChange={(e) => update("goalName", e.target.value)}
+                placeholder="Buy a car"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="targetYears">Target Years</Label>
+              <Input
+                id="targetYears"
+                type="number"
+                value={form.targetYears}
+                onChange={(e) => update("targetYears", e.target.value)}
+                placeholder="5"
+              />
+            </div>
           </CardContent>
         </Card>
 

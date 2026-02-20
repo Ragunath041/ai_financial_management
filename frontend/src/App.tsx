@@ -10,7 +10,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import FinancialInput from "./pages/FinancialInput";
 import BudgetAnalysis from "./pages/BudgetAnalysis";
-import SavingsPrediction from "./pages/SavingsPrediction";
+import FinancialGoal from "./pages/FinancialGoal";
 import ExpenseAdvisor from "./pages/ExpenseAdvisor";
 import HealthScore from "./pages/HealthScore";
 import NotFound from "./pages/NotFound";
@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/input" element={<FinancialInput />} />
             <Route path="/analysis" element={<BudgetAnalysis />} />
-            <Route path="/savings" element={<SavingsPrediction />} />
+            <Route path="/goals" element={<FinancialGoal />} />
             <Route path="/advisor" element={<ExpenseAdvisor />} />
             <Route path="/health" element={<HealthScore />} />
           </Route>

@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS financial_data (
     travel DECIMAL(10, 2) DEFAULT 0,
     others DECIMAL(10, 2) DEFAULT 0,
     savings_goal DECIMAL(10, 2) DEFAULT 0,
+    goal_name VARCHAR(100),
+    target_years INT DEFAULT 1,
     job_type VARCHAR(50),
     city VARCHAR(100),
     area VARCHAR(100),
