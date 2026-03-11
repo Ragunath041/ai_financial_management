@@ -1,178 +1,176 @@
 import { useState, useEffect } from "react";
-import { Wallet, ArrowDownRight, ArrowUpRight, Activity } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Wallet, ArrowDownRight, ArrowUpRight, Target, MapPin, Receipt, PieChart as PieIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatCard } from "@/components/StatCard";
 import { PageHeader } from "@/components/PageHeader";
-import { formatCurrency } from "@/data/mockData";
+import { formatCurrency } from "@/lib/utils";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from "recharts";
-import { analysisAPI } from "@/services/api";
+import { analysisAPI, savingsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [progressData, setProgressData] = useState<any>(null);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchAllData = async () => {
       try {
-        const data = await analysisAPI.getDashboard();
-        setDashboardData(data);
+        const [dash, progress] = await Promise.all([
+          analysisAPI.getDashboard().catch(() => null),
+          savingsAPI.getProgress().catch(() => null)
+        ]);
+        setDashboardData(dash);
+        setProgressData(progress);
       } catch (error: any) {
         toast({
-          title: "Error",
-          description: error.message || "Failed to load dashboard data",
-          variant: "destructive",
+          title: "Notice",
+          description: "Set your goals and entries to see full dashboard data.",
         });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchAllData();
   }, []);
 
   if (loading) {
     return (
       <div className="space-y-6">
         <PageHeader title="Dashboard" description="Loading your financial overview..." />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading...</div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />)}
         </div>
       </div>
     );
   }
 
-  if (!dashboardData) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Dashboard" description="Your financial overview at a glance" />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">No financial data available. Please add your financial details first.</div>
-        </div>
-      </div>
-    );
-  }
-
-  const { financial_data, expense_breakdown, health_score } = dashboardData;
-
-  // Generate monthly savings data (last 6 months)
-  const monthlySavingsData = [
-    { month: "Jan", savings: financial_data.monthly_savings * 0.9 },
-    { month: "Feb", savings: financial_data.monthly_savings * 1.1 },
-    { month: "Mar", savings: financial_data.monthly_savings * 0.85 },
-    { month: "Apr", savings: financial_data.monthly_savings * 1.15 },
-    { month: "May", savings: financial_data.monthly_savings * 0.95 },
-    { month: "Jun", savings: financial_data.monthly_savings },
-  ];
+  const hasGoal = !!progressData;
+  const hasHistory = progressData?.monthly_trend?.length > 0;
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Dashboard" description="Your financial overview at a glance" />
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex justify-between items-end">
+        <PageHeader title="Financial Dashboard" description="Smart management of your savings and expenses." />
+        <div className="hidden md:block">
+           <Link to="/monthly-entry">
+            <Button className="gap-2">
+              <Receipt className="h-4 w-4" />
+              Quick Entry
+            </Button>
+           </Link>
+        </div>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Monthly Salary"
-          value={formatCurrency(financial_data.salary)}
+          title="Total Saved"
+          value={progressData ? formatCurrency(progressData.total_saved) : "₹0"}
+          subtitle={hasGoal ? `${progressData.progress_percentage}% of goal` : "No goal set"}
           icon={Wallet}
         />
         <StatCard
-          title="Total Expenses"
-          value={formatCurrency(financial_data.total_expenses)}
-          subtitle={`${((financial_data.total_expenses / financial_data.salary) * 100).toFixed(0)}% of salary`}
-          icon={ArrowDownRight}
-          trend="down"
-        />
-        <StatCard
-          title="Monthly Savings"
-          value={formatCurrency(financial_data.monthly_savings)}
-          subtitle={`${financial_data.savings_rate}% savings rate`}
+          title="Monthly Income"
+          value={hasHistory ? formatCurrency(progressData.monthly_trend[progressData.monthly_trend.length-1].income || 0) : "₹0"}
           icon={ArrowUpRight}
           trend="up"
         />
         <StatCard
-          title="Health Score"
-          value={`${health_score.overall}/100`}
-          subtitle={health_score.overall >= 70 ? "Good standing" : health_score.overall >= 50 ? "Fair" : "Needs improvement"}
-          icon={Activity}
-          trend={health_score.overall >= 70 ? "up" : undefined}
+          title="Current Goal"
+          value={hasGoal ? progressData.goal_name : "Not Set"}
+          subtitle={hasGoal ? `Target: ${formatCurrency(progressData.target_amount)}` : "Click to setup"}
+          icon={Target}
+        />
+        <StatCard
+          title="Expenses"
+          value={hasHistory ? formatCurrency(progressData.monthly_trend[progressData.monthly_trend.length-1].total_expenses || 0) : "₹0"}
+          icon={ArrowDownRight}
+          trend="down"
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="card-shadow border-0">
-          <CardHeader>
-            <CardTitle className="font-display text-lg">Expense Breakdown</CardTitle>
+        {/* Savings Progress Preview */}
+        <Card className="border-2 border-primary/10 overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-display text-lg">Savings Progress</CardTitle>
+              <CardDescription>Actual vs Target Path</CardDescription>
+            </div>
+            <Link to="/savings-progress">
+              <Button variant="ghost" size="sm">View Details</Button>
+            </Link>
           </CardHeader>
           <CardContent>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expense_breakdown}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {expense_breakdown.map((entry: any) => (
-                      <Cell key={entry.name} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
-                    contentStyle={{
-                      borderRadius: "0.75rem",
-                      border: "none",
-                      boxShadow: "0 4px 16px -4px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-wrap justify-center gap-4 mt-2">
-              {expense_breakdown.map((e: any) => (
-                <div key={e.name} className="flex items-center gap-2 text-sm">
-                  <div className="h-3 w-3 rounded-full" style={{ background: e.color }} />
-                  <span className="text-muted-foreground">{e.name}</span>
-                  <span className="font-medium">{formatCurrency(e.value)}</span>
-                </div>
-              ))}
-            </div>
+            {hasHistory ? (
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={progressData.monthly_trend}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                    <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-lg">
+                No monthly history found.
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="card-shadow border-0">
-          <CardHeader>
-            <CardTitle className="font-display text-lg">Monthly Savings Trend</CardTitle>
+        {/* Expense Quick View */}
+        <Card className="border-2 border-accent/10">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-display text-lg">Trip Planner</CardTitle>
+              <CardDescription>Estimate your next budget</CardDescription>
+            </div>
+            <Link to="/trip-estimator">
+              <Button variant="ghost" size="sm">Go Plan</Button>
+            </Link>
           </CardHeader>
           <CardContent>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlySavingsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${v / 1000}k`} />
-                  <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
-                    contentStyle={{
-                      borderRadius: "0.75rem",
-                      border: "none",
-                      boxShadow: "0 4px 16px -4px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                  <Bar
-                    dataKey="savings"
-                    fill="hsl(160, 84%, 32%)"
-                    radius={[6, 6, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="space-y-6">
+              <div className="p-4 rounded-xl bg-accent/5 border border-accent/10 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Planning a trip to Ooty?</p>
+                    <p className="text-xs text-muted-foreground">Estimate cost for 5 days</p>
+                  </div>
+                </div>
+                <Link to="/trip-estimator" className="block">
+                  <Button variant="outline" className="w-full text-xs h-8">Try Estimator</Button>
+                </Link>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <Link to="/expense-tracker" className="block">
+                  <div className="p-4 rounded-xl border hover:bg-muted/50 transition-colors text-center">
+                    <Receipt className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <p className="text-xs font-medium">Track Expenses</p>
+                  </div>
+                </Link>
+                <Link to="/expense-visualization" className="block">
+                  <div className="p-4 rounded-xl border hover:bg-muted/50 transition-colors text-center">
+                    <PieIcon className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <p className="text-xs font-medium">Visualize Spending</p>
+                  </div>
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

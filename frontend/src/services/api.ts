@@ -215,6 +215,59 @@ export const analysisAPI = {
   },
 };
 
+// ==================== NEW REQUIREMENTS API ====================
+
+export const savingsAPI = {
+  setGoal: async (data: { goalName: string; targetAmount: number; durationMonths: number }) => {
+    const response = await authFetch('/goals', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to set goal');
+    return result;
+  },
+  getGoal: async () => {
+    const response = await authFetch('/goals');
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to get goal');
+    return result.goal;
+  },
+  addMonthlyEntry: async (data: any) => {
+    const response = await authFetch('/monthly-data', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to save monthly data');
+    return result;
+  },
+  getMonthlyEntries: async () => {
+    const response = await authFetch('/monthly-data');
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to get monthly entries');
+    return result.entries;
+  },
+  getProgress: async () => {
+    const response = await authFetch('/analytics/savings-progress');
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to get progress data');
+    return result;
+  },
+};
+
+export const tripAPI = {
+  estimate: async (data: { destination: string; days: number }) => {
+    const response = await authFetch('/trip/estimate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to get estimate');
+    return result;
+  },
+};
+
 // ==================== HEALTH CHECK ====================
 
 export const healthCheck = async () => {

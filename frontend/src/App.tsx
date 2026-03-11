@@ -8,8 +8,11 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
-import FinancialInput from "./pages/FinancialInput";
-import BudgetAnalysis from "./pages/BudgetAnalysis";
+import MonthlyEntry from "./pages/MonthlyEntry";
+import SavingsProgress from "./pages/SavingsProgress";
+import ExpenseTracker from "./pages/ExpenseTracker";
+import ExpenseVisuals from "./pages/ExpenseVisuals";
+import TripEstimator from "./pages/TripEstimator";
 import FinancialGoal from "./pages/FinancialGoal";
 import ExpenseAdvisor from "./pages/ExpenseAdvisor";
 import HealthScore from "./pages/HealthScore";
@@ -36,9 +39,12 @@ const App = () => (
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/input" element={<FinancialInput />} />
-            <Route path="/analysis" element={<BudgetAnalysis />} />
             <Route path="/goals" element={<FinancialGoal />} />
+            <Route path="/monthly-entry" element={<MonthlyEntry />} />
+            <Route path="/savings-progress" element={<SavingsProgress />} />
+            <Route path="/expense-tracker" element={<ExpenseTracker />} />
+            <Route path="/expense-visualization" element={<ExpenseVisuals />} />
+            <Route path="/trip-estimator" element={<TripEstimator />} />
             <Route path="/advisor" element={<ExpenseAdvisor />} />
             <Route path="/health" element={<HealthScore />} />
           </Route>

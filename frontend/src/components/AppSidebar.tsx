@@ -32,10 +32,12 @@ import { useState, useEffect } from "react";
 
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Financial Input", url: "/input", icon: FileInput },
-  { title: "Budget Analysis", url: "/analysis", icon: PieChart },
-  { title: "Financial Goal", url: "/goals", icon: Target },
-  { title: "Health Score", url: "/health", icon: Activity },
+  { title: "Goal Setup", url: "/goals", icon: Target },
+  { title: "Monthly Entry", url: "/monthly-entry", icon: FileInput },
+  { title: "Savings Progress", url: "/savings-progress", icon: TrendingUp },
+  { title: "Expense Tracker", url: "/expense-tracker", icon: Wallet },
+  { title: "Expense Visuals", url: "/expense-visualization", icon: PieChart },
+  { title: "Trip Estimator", url: "/trip-estimator", icon: MapPin },
 ];
 
 export function AppSidebar() {
